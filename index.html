@@ -1,4 +1,27 @@
-<!DOCTYPE html>
+
+<script>
+  // 定時巡邏 + Shadow DOM 穿透清理水印
+  (function killWatermark() {
+    const clean = () => {
+      // 1. 清除普通 DOM 節點
+      document.querySelectorAll('[data-custom-element*="watermark"], [data-custom-element*="doubao"], .watermark-root').forEach(el => el.remove());
+      
+      // 2. 深入清理 Shadow DOM 內部的水印
+      document.querySelectorAll('*').forEach(el => {
+        if (el.shadowRoot) {
+          el.shadowRoot.querySelectorAll('[class*="watermark"], [class*="doubao"], .watermark-root, style').forEach(s => {
+            if (s.textContent && s.textContent.includes('fixed')) s.remove();
+            if (s.className && typeof s.className === 'string' && s.className.includes('watermark')) s.remove();
+          });
+        }
+      });
+    };
+    
+    // 頁面加載前後持續掃描清理
+    setInterval(clean, 50);
+    window.addEventListener('DOMContentLoaded', clean);
+  })();
+</script><!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <style>
